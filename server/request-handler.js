@@ -35,27 +35,32 @@ var requestHandler = function(request, response) {
   response._data = data;
   // The outgoing status.
   var statusCode;
-  if (request.method === 'GET') {
+
+  if (request.method.toUpperCase() === 'GET') {
     statusCode = 200;
-    // console.log("RESPOSNE DDATATA!" , response._data);
-  } else if (request.method === 'POST') {
+  }
+  if (request.method.toUpperCase() === 'POST') {
     statusCode = 201;
-    // console.log("request", request,"request._postData:",request._postData);
-    //data.results.unshift(request._postData);
     request.on('data', function(d) {
-      console.log(JSON.parse(d));
+      // console.log(JSON.parse(d));
       data.results.unshift(JSON.parse(d));
     });
-  } else {
-    statusCode = 404;
-  }
+  } 
+  if (request.method.toUpperCase() === 'OPTIONS') {
+    
+    statusCode = 200;
+  } 
 
-
-  if (response._ended === true) {
+  if (request.url !== '/classes/messages') {
     statusCode = 404;
   }
   // See the note below about CORS headers.
-  var headers = defaultCorsHeaders;
+  var headers = {
+    'access-control-allow-origin': '*',
+    'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'access-control-allow-headers': 'content-type, accept',
+    'access-control-max-age': 10 // Seconds.
+  };
 
   // Teljhjl the client we are sending them plain text.
   //
